@@ -12,7 +12,6 @@ export default function SubmitSection({ confessionText }) {
     }
 
     try {
-      console.log('API URL:', import.meta.env.VITE_API_URL);
       setLoading(true);
 
       const response = await fetch(
@@ -23,32 +22,27 @@ export default function SubmitSection({ confessionText }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            message: confessionText,
+            confession: confessionText,
           }),
         },
       );
-
-      console.log('STATUS:', response.status);
 
       if (!response.ok) {
         throw new Error(`Request failed: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log(data);
 
       if (data.success) {
         navigate('/success', {
           state: {
             confessionNo: data.confessionNo,
             queueAhead: data.queueAhead,
-            eta: data.estimatedPostTime,
+            eta: data.eta,
           },
         });
       } else {
-        {
-          alert('Submission failed');
-        }
+        alert('Submission failed');
       }
     } catch (error) {
       console.error(error);
