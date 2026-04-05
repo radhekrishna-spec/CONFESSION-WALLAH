@@ -5,7 +5,7 @@ export default function SubmitSection({ confessionText }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const submitConfession = async () => {
+  const submitConfession = async (paymentResponse = null) => {
     if (!confessionText.trim()) {
       alert('Please write your confession first');
       return;
@@ -23,6 +23,8 @@ export default function SubmitSection({ confessionText }) {
           },
           body: JSON.stringify({
             message: confessionText,
+            isPaid: !!paymentResponse,
+            paymentId: paymentResponse?.razorpay_payment_id || null,
           }),
         },
       );
@@ -62,7 +64,7 @@ export default function SubmitSection({ confessionText }) {
       handler: async function (response) {
         console.log('Payment Success:', response);
 
-        await submitConfession();
+        await submitConfession(response);
       },
       prefill: {
         name: 'Anonymous User',
