@@ -12,7 +12,7 @@ export default function SubmitSection({ confessionText }) {
     }
 
     try {
-      setLoading(true);
+      //setLoading(true);
 
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/confessions/submit`,
@@ -85,6 +85,10 @@ export default function SubmitSection({ confessionText }) {
     };
 
     const rzp = new window.Razorpay(options);
+    rzp.on('payment.failed', function () {
+      setLoading(false);
+      alert('Payment failed. Please try again.');
+    });
     rzp.open();
   };
   return (
