@@ -1,6 +1,36 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+function getEstimatedDate(queueAhead) {
+  let dailyPosts = 3;
+
+  if (queueAhead <= 3) dailyPosts = 3;
+  else if (queueAhead <= 6) dailyPosts = 6;
+  else if (queueAhead <= 10) dailyPosts = 8;
+  else dailyPosts = 14;
+
+  const now = new Date();
+  const hour = now.getHours();
+
+  let extraDay = 0;
+
+  // agar aaj ke slots almost nikal gaye
+  if (hour >= 18) {
+    extraDay = 1;
+  }
+
+  const daysNeeded = Math.ceil(queueAhead / dailyPosts) - 1 + extraDay;
+
+  const estimated = new Date();
+  estimated.setDate(now.getDate() + daysNeeded);
+
+  return estimated.toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
 export default function SuccessPage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -170,9 +200,12 @@ export default function SuccessPage() {
               </div>
 
               <div className="rounded-2xl bg-indigo-50 p-4 border border-indigo-100">
-                <p className="text-sm text-gray-500">Expected Post Time</p>
+                <p className="text-sm text-gray-500">Estimated Posting Date</p>
                 <p className="text-lg font-semibold text-indigo-700">
-                  {details.eta}
+                  Likely by {getEstimatedDate(details.queueAhead)}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Based on current queue volume and posting schedule
                 </p>
               </div>
             </div>
