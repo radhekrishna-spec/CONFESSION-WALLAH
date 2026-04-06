@@ -7,13 +7,12 @@ export default function ConfessionForm({
   return (
     <div className="rounded-3xl bg-white shadow-lg p-6">
       <label className="font-semibold text-gray-700">
-        Is there something you always wanted to tell someone? *
+        Is there something you always wanted to tell someonee ? *
       </label>
-
       <textarea
         id="confession"
         rows={6}
-        maxLength={500}
+        maxLength={6000}
         value={confessionText}
         onChange={(e) => {
           setConfessionText(e.target.value);
@@ -23,7 +22,7 @@ export default function ConfessionForm({
         placeholder="Write your confession here..."
       />
 
-      <p className="text-right text-sm text-gray-500 mt-2">{charCount}/500</p>
+      <p className="text-right text-sm text-gray-500 mt-2">{charCount}/6000</p>
     </div>
   );
 }

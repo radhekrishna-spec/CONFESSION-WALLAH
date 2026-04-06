@@ -4,6 +4,7 @@ import ConfessionForm from '../components/ConfessionForm';
 import NicknameInput from '../components/NicknameInput';
 import MoodSelector from '../components/MoodSelector';
 import SubmitSection from '../components/SubmitSection';
+import SubmitConfession from '../SubmitConfession';
 
 export default function UserConfessionPage() {
   const [charCount, setCharCount] = useState(0);
