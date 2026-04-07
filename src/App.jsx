@@ -12,8 +12,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<UserConfessionPage />} />
         <Route path="/success" element={<SuccessPage />} />
-        <Route path="/admin/login" element={<AdminLoginPage />} />
-        <Route path="/admin" element={<AdminDashboardPage />} />
+       
       </Routes>
     </BrowserRouter>
   );
