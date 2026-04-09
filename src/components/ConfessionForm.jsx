@@ -20,32 +20,32 @@ export default function ConfessionForm({
 
     if (value.trim().length < 2) {
       setSongSuggestions([]);
+      setShowDropdown(false);
       return;
     }
+
+    setIsSearching(true);
 
     try {
       const res = await fetch(
         `https://testing-confe-backend.onrender.com/api/song-search?q=${encodeURIComponent(
           value.trim(),
-        )}&entity=song&limit=5`,
+        )}`,
       );
 
       const data = await res.json();
 
-      const songs = (data.results || []).map((song) => ({
-        id: song.trackId,
-        title: song.trackName,
-        artist: {
-          name: song.artistName,
-        },
-        previewUrl: song.previewUrl,
-        artwork: song.artworkUrl100,
-      }));
+      console.log('SONG API RESPONSE:', data);
+
+      const songs = data.data || [];
 
       setSongSuggestions(songs);
+      setShowDropdown(true);
     } catch (error) {
       console.error('Song search error', error);
       setSongSuggestions([]);
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -54,6 +54,7 @@ export default function ConfessionForm({
 
     setSongQuery(value);
     setSelectedSong('');
+    setShowDropdown(true);
 
     clearTimeout(timeoutRef.current);
 
