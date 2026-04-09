@@ -13,21 +13,11 @@ export default function ConfessionForm({
   const handleSongSearch = async (value) => {
     setSongQuery(value);
 
-    if (value.toLowerCase() === 'kesariya') {
-      setSongSuggestions([
-        {
-          id: 1,
-          title: 'Kesariya',
-          artist: { name: 'Arijit Singh' },
-        },
-      ]);
+    if (value.trim().length < 2) {
+      setSongSuggestions([]);
       return;
     }
 
-    // if (value.trim().length < 3) {
-    //   setSongSuggestions([]);
-    //   return;
-    // }
     try {
       const res = await fetch(
         `https://white-pony-main-db1c939.d2.zuplo.dev/search-song?q=${encodeURIComponent(value.trim())}`,
@@ -35,22 +25,12 @@ export default function ConfessionForm({
 
       const data = await res.json();
 
-      let songs = data?.data || [];
-
-      // fallback if empty
-      if (!songs.length && value.toLowerCase().includes('kes')) {
-        songs = [
-          {
-            id: 1,
-            title: 'Kesariya',
-            artist: { name: 'Arijit Singh' },
-          },
-        ];
-      }
+      const songs = data?.data || [];
 
       setSongSuggestions(songs.slice(0, 5));
     } catch (error) {
       console.error('Song search error', error);
+      setSongSuggestions([]);
     }
   };
 
@@ -77,10 +57,11 @@ export default function ConfessionForm({
         <input
           type="text"
           placeholder="Search song..."
-          value={songQuery}
+          value={songQuery || selectedSong}
           onChange={(e) => {
             const value = e.target.value;
             setSongQuery(value);
+            setSelectedSong('');
 
             clearTimeout(window.songTimeout);
 
@@ -107,6 +88,12 @@ export default function ConfessionForm({
                 {song.title} - {song.artist.name}
               </div>
             ))}
+          </div>
+        )}
+
+        {songQuery.trim().length >= 2 && songSuggestions.length === 0 && (
+          <div className="mt-2 rounded border bg-white p-2 text-sm text-gray-500 shadow">
+            No song found 🎵
           </div>
         )}
       </div>
