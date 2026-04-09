@@ -9,8 +9,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/:collegeId" element={<UserConfessionPage />} />
         <Route path="/" element={<UserConfessionPage />} />
-        <Route path="/success" element={<SuccessPage />} />
+
+        <Route path="/:collegeId/success" element={<SuccessPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function SubmitSection({ confessionText }) {
+export default function SubmitSection({ confessionText, collegeId }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -23,6 +23,7 @@ export default function SubmitSection({ confessionText }) {
           },
           body: JSON.stringify({
             message: confessionText,
+            collegeId,
             isPaid: !!paymentResponse,
             paymentId: paymentResponse?.razorpay_payment_id || null,
           }),
@@ -69,7 +70,7 @@ export default function SubmitSection({ confessionText }) {
         console.log('Payment Success:', response);
         sessionStorage.removeItem('confessionDetails');
 
-        navigate('/success', {
+        navigate(`/${collegeId}/success`, {
           state: {
             loadingDetails: true,
           },

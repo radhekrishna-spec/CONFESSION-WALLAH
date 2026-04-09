@@ -6,16 +6,19 @@ import NicknameInput from '../components/NicknameInput';
 import SubmitSection from '../components/SubmitSection';
 
 export default function UserConfessionPage() {
+  const { collegeId } = useParams();
+  const [college, setCollege] = useState(null);
   const [charCount, setCharCount] = useState(0);
   const [confessionText, setConfessionText] = useState('');
-  const [college, setCollege] = useState(null);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/college/college-info`)
+    fetch(
+      `${import.meta.env.VITE_API_URL}/api/college/college-info?collegeId=${collegeId || 'miet'}`,
+    )
       .then((res) => res.json())
       .then((data) => setCollege(data))
       .catch((err) => console.log(err));
-  }, []);
+  }, [collegeId]);
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 py-8 px-4 overflow-hidden">
@@ -24,6 +27,9 @@ export default function UserConfessionPage() {
       <div className="absolute bottom-20 right-10 h-52 w-52 rounded-full bg-pink-300/20 blur-3xl animate-pulse"></div>
 
       <div className="relative max-w-2xl mx-auto space-y-6 animate-fadeIn">
+        <h1 className="text-2xl font-bold text-center text-violet-700">
+          {college?.name || 'Campus Confessions'}
+        </h1>
         <ConfessionHero title={college?.name || 'Campus Confessions'} />
 
         <div className="grid grid-cols-3 gap-4">
@@ -53,8 +59,10 @@ export default function UserConfessionPage() {
         <NicknameInput />
 
         <MoodSelector />
-
-        <SubmitSection confessionText={confessionText} />
+        <SubmitSection
+          confessionText={confessionText}
+          collegeId={collegeId || 'miet'}
+        />
       </div>
     </div>
   );
