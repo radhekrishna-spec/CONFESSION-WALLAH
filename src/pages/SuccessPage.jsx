@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 function getEstimatedDate(queueAhead) {
   let dailyPosts = 3;
@@ -35,6 +35,7 @@ export default function SuccessPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const intervalRef = useRef(null);
+  const { collegeId } = useParams();
 
   const initialDetails = useMemo(() => {
     try {
@@ -145,7 +146,7 @@ export default function SuccessPage() {
             </button>
 
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate(`/${collegeId}`)}
               className="mt-3 w-full rounded-2xl border border-violet-600 py-3 text-violet-600 font-semibold hover:bg-violet-50 transition"
             >
               Submit Another Confession
