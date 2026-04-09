@@ -13,6 +13,7 @@ export default function UserConfessionPage() {
   const [formData, setFormData] = useState({
     message: '',
     nickname: '',
+    song: '',
   });
 
   useEffect(() => {
@@ -59,6 +60,13 @@ export default function UserConfessionPage() {
             setFormData((prev) => ({
               ...prev,
               message: value,
+            }))
+          }
+          selectedSong={formData.song}
+          setSelectedSong={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              song: value,
             }))
           }
         />
