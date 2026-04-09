@@ -25,7 +25,7 @@ export default function ConfessionForm({
 
     try {
       const res = await fetch(
-        `https://itunes.apple.com/search?term=${encodeURIComponent(
+        `https://testing-confe-backend.onrender.com/api/song-search?q=${encodeURIComponent(
           value.trim(),
         )}&entity=song&limit=5`,
       );
