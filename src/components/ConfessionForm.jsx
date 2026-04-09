@@ -158,18 +158,27 @@ export default function ConfessionForm({
 
         {/* SUGGESTIONS */}
         {!isSearching && showDropdown && songSuggestions.length > 0 && (
-          <div className="absolute left-0 right-0 mt-2 max-h-72 overflow-y-auto rounded-2xl border bg-white shadow-2xl z-50">
+          <div className="absolute left-0 right-0 mt-2 max-h-72 overflow-y-auto rounded-2xl bg-white shadow-2xl border border-gray-100 z-50 p-2">
             {songSuggestions.map((song) => (
               <div
                 key={song.id}
-                className="flex items-center gap-3 p-3 cursor-pointer hover:bg-violet-50 transition border-b last:border-b-0"
+                className="flex items-center gap-3 p-4 cursor-pointer hover:bg-violet-50 transition-all duration-200 rounded-xl mx-2 my-1"
                 onClick={() => handleSongSelect(song)}
               >
-                <img
-                  src={song.album?.cover || 'https://via.placeholder.com/50'}
-                  alt={song.title}
-                  className="w-12 h-12 rounded-lg object-cover"
-                />
+                {song.album?.cover ? (
+                  <img
+                    src={song.album.cover}
+                    alt={song.title}
+                    className="w-12 h-12 rounded-xl object-cover shadow-sm"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-xl bg-violet-100 flex items-center justify-center text-lg">
+                    🎵
+                  </div>
+                )}
 
                 <div className="flex-1">
                   <p className="font-medium text-gray-800">{song.title}</p>
