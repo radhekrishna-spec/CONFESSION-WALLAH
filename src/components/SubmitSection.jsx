@@ -15,7 +15,7 @@ export default function SubmitSection({ formData, collegeId }) {
       //setLoading(true);
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/confessions/submit?collegeId=${collegeId}`,
+        `${import.meta.env.VITE_API_URL}/api/confessions/submit`,
         {
           method: 'POST',
           headers: {
