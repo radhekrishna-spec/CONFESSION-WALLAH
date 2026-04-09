@@ -25,6 +25,10 @@ export default function ConfessionForm({
 
       const data = await res.json();
 
+      console.log('SEARCH VALUE:', value);
+      console.log('API RESPONSE:', data);
+      console.log('SONGS:', data?.data);
+
       const songs = data?.data || [];
 
       setSongSuggestions(songs.slice(0, 5));
