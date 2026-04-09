@@ -1,9 +1,5 @@
-export default function ConfessionForm({
-  charCount,
-  setCharCount,
-  confessionText,
-  setConfessionText,
-}) {
+export default function ConfessionForm({ confessionText, setConfessionText }) {
+  const charCount = confessionText.length;
   return (
     <div className="rounded-3xl bg-white shadow-lg p-6">
       <label className="font-semibold text-gray-700">
@@ -14,10 +10,7 @@ export default function ConfessionForm({
         rows={6}
         maxLength={6000}
         value={confessionText}
-        onChange={(e) => {
-          setConfessionText(e.target.value);
-          setCharCount(e.target.value.length);
-        }}
+        onChange={(e) => setConfessionText(e.target.value)}
         className="mt-4 w-full rounded-2xl border border-gray-300 p-4 outline-none focus:ring-2 focus:ring-violet-400"
         placeholder="Write your confession here..."
       />

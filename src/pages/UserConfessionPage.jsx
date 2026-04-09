@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import ConfessionForm from '../components/ConfessionForm';
 import ConfessionHero from '../components/ConfessionHero';
-import MoodSelector from '../components/MoodSelector';
+
 import NicknameInput from '../components/NicknameInput';
 import SubmitSection from '../components/SubmitSection';
 
 export default function UserConfessionPage() {
   const { collegeId } = useParams();
   const [college, setCollege] = useState(null);
-  const [charCount, setCharCount] = useState(0);
-  const [confessionText, setConfessionText] = useState('');
+  const [formData, setFormData] = useState({
+    message: '',
+    nickname: '',
+  });
 
   useEffect(() => {
     fetch(
@@ -50,19 +53,26 @@ export default function UserConfessionPage() {
         </div>
 
         <ConfessionForm
-          charCount={charCount}
-          setCharCount={setCharCount}
-          confessionText={confessionText}
-          setConfessionText={setConfessionText}
+          confessionText={formData.message}
+          setConfessionText={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              message: value,
+            }))
+          }
         />
 
-        <NicknameInput />
-
-        <MoodSelector />
-        <SubmitSection
-          confessionText={confessionText}
-          collegeId={collegeId || 'miet'}
+        <NicknameInput
+          nickname={formData.nickname}
+          setNickname={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              nickname: value,
+            }))
+          }
         />
+
+        <SubmitSection formData={formData} collegeId={collegeId || 'miet'} />
       </div>
     </div>
   );

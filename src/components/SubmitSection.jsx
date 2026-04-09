@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function SubmitSection({ confessionText, collegeId }) {
+export default function SubmitSection({ formData, collegeId }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const submitConfession = async (paymentResponse = null) => {
-    if (!confessionText.trim()) {
+    if (!formData.message.trim()) {
       alert('Please write your confession first');
       return;
     }
@@ -22,7 +22,7 @@ export default function SubmitSection({ confessionText, collegeId }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            message: confessionText,
+            ...formData,
             collegeId,
             isPaid: !!paymentResponse,
             paymentId: paymentResponse?.razorpay_payment_id || null,
