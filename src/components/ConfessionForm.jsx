@@ -8,7 +8,9 @@ export default function ConfessionForm({
 }) {
   const charCount = confessionText.length;
 
-  const [songQuery, setSongQuery] = useState(selectedSong || '');
+  const [songQuery, setSongQuery] = useState(
+    selectedSong ? `${selectedSong.title} - ${selectedSong.artist}` : '',
+  );
   const [songSuggestions, setSongSuggestions] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -86,12 +88,15 @@ export default function ConfessionForm({
       handleSongSearch(value);
     }, 400);
   };
-
   const handleSongSelect = (song) => {
-    const selected = `${song.title} - ${song.artist?.name || 'Unknown Artist'}`;
+    const selected = {
+      title: song.title,
+      artist: song.artist?.name || 'Unknown Artist',
+      source: 'manual',
+    };
 
     setSelectedSong(selected);
-    setSongQuery(selected);
+    setSongQuery(`${selected.title} - ${selected.artist}`);
     setSongSuggestions([]);
     setShowDropdown(false);
   };
@@ -211,7 +216,9 @@ export default function ConfessionForm({
           <div className="mt-4 rounded-2xl bg-violet-50 border border-violet-200 px-4 py-3 flex justify-between items-center">
             <div>
               <p className="text-xs text-violet-500">Selected Song</p>
-              <p className="font-semibold text-violet-700">{selectedSong}</p>
+              <p className="font-semibold text-violet-700">
+                {selectedSong.title} - {selectedSong.artist}
+              </p>
             </div>
 
             <button
