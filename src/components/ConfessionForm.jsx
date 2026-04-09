@@ -16,34 +16,36 @@ export default function ConfessionForm({
   const timeoutRef = useRef(null);
 
   const handleSongSearch = async (value) => {
-    const query = value.trim();
+    setSongQuery(value);
 
-    if (query.length < 2) {
+    if (value.trim().length < 2) {
       setSongSuggestions([]);
-      setShowDropdown(false);
-      setIsSearching(false);
       return;
     }
 
     try {
-      setIsSearching(true);
-
       const res = await fetch(
-        `https://white-pony-main-db1c939.d2.zuplo.dev/search-song?q=${encodeURIComponent(query)}`,
+        `https://itunes.apple.com/search?term=${encodeURIComponent(
+          value.trim(),
+        )}&entity=song&limit=5`,
       );
 
       const data = await res.json();
 
-      const songs = data?.data || [];
+      const songs = (data.results || []).map((song) => ({
+        id: song.trackId,
+        title: song.trackName,
+        artist: {
+          name: song.artistName,
+        },
+        previewUrl: song.previewUrl,
+        artwork: song.artworkUrl100,
+      }));
 
-      setSongSuggestions(songs.slice(0, 5));
-      setShowDropdown(true);
+      setSongSuggestions(songs);
     } catch (error) {
-      console.error('Song search error:', error);
+      console.error('Song search error', error);
       setSongSuggestions([]);
-      setShowDropdown(true);
-    } finally {
-      setIsSearching(false);
     }
   };
 
