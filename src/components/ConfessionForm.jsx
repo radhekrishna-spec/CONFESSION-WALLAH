@@ -13,20 +13,23 @@ export default function ConfessionForm({
   const handleSongSearch = async (value) => {
     setSongQuery(value);
 
-    if (!value.trim()) {
+    if (value.trim().length < 3) {
       setSongSuggestions([]);
       return;
     }
 
     try {
       const res = await fetch(
-        `https://white-pony-main-db1c939.d2.zuplo.dev/search-song?q=${encodeURIComponent(value)}`,
+        `https://white-pony-main-db1c939.d2.zuplo.dev/search-song?q=${encodeURIComponent(value.trim())}`,
       );
 
       const data = await res.json();
+
       console.log('FULL API RESPONSE:', data);
-      console.log('SONGS:', data.data);
-      setSongSuggestions(data.data || []);
+
+      const songs = data?.data || [];
+
+      setSongSuggestions(songs.slice(0, 5));
     } catch (error) {
       console.error('Song search error', error);
     }
