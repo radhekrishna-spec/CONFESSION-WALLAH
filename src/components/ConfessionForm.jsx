@@ -24,6 +24,8 @@ export default function ConfessionForm({
       );
 
       const data = await res.json();
+      console.log('FULL API RESPONSE:', data);
+      console.log('SONGS:', data.data);
       setSongSuggestions(data.data || []);
     } catch (error) {
       console.error('Song search error', error);
