@@ -59,7 +59,16 @@ export default function ConfessionForm({
           type="text"
           placeholder="Search song..."
           value={songQuery || selectedSong}
-          onChange={(e) => handleSongSearch(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            setSongQuery(value);
+
+            clearTimeout(window.songTimeout);
+
+            window.songTimeout = setTimeout(() => {
+              handleSongSearch(value);
+            }, 400);
+          }}
           className="w-full border rounded p-2"
         />
 
