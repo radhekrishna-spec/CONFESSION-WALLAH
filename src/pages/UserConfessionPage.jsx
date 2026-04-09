@@ -8,6 +8,7 @@ import SubmitSection from '../components/SubmitSection';
 
 export default function UserConfessionPage() {
   const { collegeId } = useParams();
+  const activeCollegeId = collegeId || 'miet';
   const [college, setCollege] = useState(null);
   const [formData, setFormData] = useState({
     message: '',
@@ -16,12 +17,12 @@ export default function UserConfessionPage() {
 
   useEffect(() => {
     fetch(
-      `${import.meta.env.VITE_API_URL}/api/college/college-info?collegeId=${collegeId || 'miet'}`,
+      `${import.meta.env.VITE_API_URL}/api/college/college-info?collegeId=${activeCollegeId}`,
     )
       .then((res) => res.json())
       .then((data) => setCollege(data))
       .catch((err) => console.log(err));
-  }, [collegeId]);
+  }, [activeCollegeId]);
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 py-8 px-4 overflow-hidden">
@@ -72,7 +73,7 @@ export default function UserConfessionPage() {
           }
         />
 
-        <SubmitSection formData={formData} collegeId={collegeId || 'miet'} />
+        <SubmitSection formData={formData} collegeId={activeCollegeId} />
       </div>
     </div>
   );
