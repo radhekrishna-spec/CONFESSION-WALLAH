@@ -6,18 +6,14 @@ export default function SubmitSection({ formData, collegeId }) {
   const navigate = useNavigate();
 
   const submitConfession = async (paymentResponse = null) => {
-    if (!formData.message.trim()) {
+    if (!formData.message?.trim()) {
       alert('Please write your confession first');
       return;
     }
 
     try {
-      //setLoading(true);
       console.log('API URL:', import.meta.env.VITE_API_URL);
-      console.log(
-        'FINAL URL:',
-        `${import.meta.env.VITE_API_URL}/api/confessions/submit?collegeId=${collegeId}`,
-      );
+
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/confessions/submit?collegeId=${collegeId}`,
         {
@@ -63,7 +59,13 @@ export default function SubmitSection({ formData, collegeId }) {
   const handleSubmit = async () => {
     if (loading) return;
 
+    if (!formData.message?.trim()) {
+      alert('Please write your confession first');
+      return;
+    }
+
     setLoading(true);
+
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: 200,
@@ -73,45 +75,60 @@ export default function SubmitSection({ formData, collegeId }) {
 
       handler: async function (response) {
         console.log('Payment Success:', response);
+
         sessionStorage.removeItem('confessionDetails');
+
+        await submitConfession(response);
 
         navigate(`/${collegeId}/success`, {
           state: {
             loadingDetails: true,
           },
         });
-
-        submitConfession(response);
       },
 
       prefill: {
         name: 'Anonymous User',
+        contact: '',
+        email: '',
       },
 
       method: {
         upi: true,
       },
 
-      config: {
-        display: {
-          preferences: {
-            show_default_blocks: true,
-          },
+      theme: {
+        color: '#7c3aed',
+      },
+
+      modal: {
+        ondismiss: function () {
+          setLoading(false);
         },
       },
 
-      theme: {
-        color: '#7c3aed',
+      retry: {
+        enabled: true,
+      },
+
+      send_sms_hash: true,
+
+      readonly: {
+        name: true,
       },
     };
 
     const rzp = new window.Razorpay(options);
-    rzp.on('payment.failed', function () {
+
+    rzp.on('payment.failed', function (response) {
+      console.log('Payment Failed:', response);
       setLoading(false);
       alert('Payment failed. Please try again.');
     });
+
     rzp.open();
   };
+
   return (
     <>
       <div className="rounded-3xl backdrop-blur-lg bg-white/70 shadow-lg p-6">
@@ -152,7 +169,7 @@ export default function SubmitSection({ formData, collegeId }) {
         >
           {loading ? (
             <span className="flex items-center justify-center">
-              Submitting<span className="animate-bounce ml-1">...</span>
+              Processing<span className="animate-bounce ml-1">...</span>
             </span>
           ) : (
             'Pay ₹2 & Submit'
