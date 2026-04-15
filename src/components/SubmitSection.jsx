@@ -66,7 +66,7 @@ export default function SubmitSection({ formData, collegeId }) {
     setLoading(true);
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-      amount: 200, // ₹2
+      amount: 200,
       currency: 'INR',
       name: 'CONFESSION WALLAH',
       description: 'Confession Submission',
@@ -90,28 +90,12 @@ export default function SubmitSection({ formData, collegeId }) {
 
       method: {
         upi: true,
-        card: false,
-        netbanking: false,
-        wallet: false,
-        emi: false,
       },
 
       config: {
         display: {
-          blocks: {
-            upi: {
-              name: 'Pay via UPI',
-              instruments: [
-                {
-                  method: 'upi',
-                  flows: ['collect', 'intent'],
-                },
-              ],
-            },
-          },
-          sequence: ['block.upi'],
           preferences: {
-            show_default_blocks: false,
+            show_default_blocks: true,
           },
         },
       },
