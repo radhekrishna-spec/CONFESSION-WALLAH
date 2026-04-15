@@ -70,6 +70,7 @@ export default function SubmitSection({ formData, collegeId }) {
       currency: 'INR',
       name: 'CONFESSION WALLAH',
       description: 'Confession Submission',
+
       handler: async function (response) {
         console.log('Payment Success:', response);
         sessionStorage.removeItem('confessionDetails');
@@ -82,9 +83,39 @@ export default function SubmitSection({ formData, collegeId }) {
 
         submitConfession(response);
       },
+
       prefill: {
         name: 'Anonymous User',
       },
+
+      method: {
+        upi: true,
+        card: false,
+        netbanking: false,
+        wallet: false,
+        emi: false,
+      },
+
+      config: {
+        display: {
+          blocks: {
+            upi: {
+              name: 'Pay via UPI',
+              instruments: [
+                {
+                  method: 'upi',
+                  flows: ['collect', 'intent'],
+                },
+              ],
+            },
+          },
+          sequence: ['block.upi'],
+          preferences: {
+            show_default_blocks: false,
+          },
+        },
+      },
+
       theme: {
         color: '#7c3aed',
       },
