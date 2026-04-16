@@ -125,7 +125,7 @@ export default function ConfessionForm({
 
       <p className="text-right text-sm text-gray-500 mt-2">{charCount}/6000</p>
 
-      <div className="mt-6 relative" ref={dropdownRef}>
+      <div className="hidden mt-6 relative" ref={dropdownRef}>
         <label className="block mb-2 font-medium text-gray-700">
           Add a Song (optional)
         </label>
