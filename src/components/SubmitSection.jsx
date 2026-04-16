@@ -1,9 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function SubmitSection({ formData, collegeId }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [paymentEnabled, setPaymentEnabled] = useState(false);
+  const [paymentLink, setPaymentLink] = useState('');
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/api/admin/college/${collegeId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setPaymentEnabled(!!data?.data?.payment?.enabled);
+        setPaymentLink(data?.data?.payment?.razorpayLink || '');
+      })
+      .catch(console.error);
+  }, [collegeId]);
 
   const submitConfession = async (paymentResponse = null) => {
     if (!formData.message?.trim()) {
@@ -65,6 +77,18 @@ export default function SubmitSection({ formData, collegeId }) {
     }
 
     setLoading(true);
+
+    if (!paymentEnabled) {
+      await submitConfession(null);
+
+      navigate(`/${collegeId}/success`, {
+        state: {
+          loadingDetails: true,
+        },
+      });
+
+      return;
+    }
 
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -171,8 +195,10 @@ export default function SubmitSection({ formData, collegeId }) {
             <span className="flex items-center justify-center">
               Processing<span className="animate-bounce ml-1">...</span>
             </span>
-          ) : (
+          ) : paymentEnabled ? (
             'Pay ₹2 & Submit'
+          ) : (
+            'Submit Confession'
           )}
         </button>
       </div>
