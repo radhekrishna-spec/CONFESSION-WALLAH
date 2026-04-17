@@ -1,55 +1,47 @@
 export default function ConfessionResponseCard({ response }) {
   return (
-    <div className="max-w-2xl mx-auto space-y-4">
+    <div className="max-w-2xl mx-auto space-y-5 text-white">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow p-5">
-        <h2 className="text-3xl font-bold text-violet-700">
-          Anonymous Confession 💌
-        </h2>
+      <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-6">
+        <h2 className="text-2xl font-bold">💌 Anonymous Confession</h2>
 
-        <p className="mt-2 text-gray-600 leading-7">
-          This is a safe space to share your feelings anonymously.
+        <p className="mt-3 text-gray-400 leading-7">
+          Share your thoughts freely.
           <br />
-          No judgement. No identity reveal.
+          No judgement. No identity.
           <br />
-          Speak your heart freely.
+          Just your voice.
         </p>
       </div>
 
       {/* Confession */}
-      <div className="bg-white rounded-xl shadow p-5">
-        <p className="text-sm text-gray-500 mb-2">
-          Is there something you always wanted to tell someone?
+      <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-6">
+        <p className="text-xs text-gray-500 mb-2">Your Confession</p>
+
+        <p className="text-gray-200 leading-7 whitespace-pre-wrap">
+          {response.confession || '—'}
         </p>
-        <p className="text-gray-800">{response.confession}</p>
       </div>
 
       {/* Nickname */}
-      <div className="bg-white rounded-xl shadow p-5">
-        <p className="text-sm text-gray-500 mb-2">Optional Nickname</p>
-        <p className="text-gray-800">{response.nickname}</p>
-      </div>
+      {response.nickname && (
+        <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-6">
+          <p className="text-xs text-gray-500 mb-2">Nickname</p>
+
+          <p className="text-gray-200">{response.nickname}</p>
+        </div>
+      )}
 
       {/* Mood */}
-      <div className="bg-white rounded-xl shadow p-5">
-        <p className="text-sm text-gray-500 mb-4">Your Mood Right Now?</p>
+      {response.mood && (
+        <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-6">
+          <p className="text-xs text-gray-500 mb-3">Mood</p>
 
-        <div className="space-y-3">
-          {[
-            'Happy 😊',
-            'Confused 😔',
-            'Broken 💔',
-            'In Love ❤️',
-            'Regret 😞',
-            'Sad 😓',
-          ].map((mood) => (
-            <label key={mood} className="flex items-center gap-3">
-              <input type="radio" checked={response.mood === mood} readOnly />
-              {mood}
-            </label>
-          ))}
+          <div className="inline-flex items-center px-4 py-2 rounded-xl bg-white/10 border border-white/10">
+            {response.mood}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

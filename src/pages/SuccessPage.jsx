@@ -12,12 +12,7 @@ function getEstimatedDate(queueAhead) {
   const now = new Date();
   const hour = now.getHours();
 
-  let extraDay = 0;
-
-  // agar aaj ke slots almost nikal gaye
-  if (hour >= 18) {
-    extraDay = 1;
-  }
+  let extraDay = hour >= 18 ? 1 : 0;
 
   const daysNeeded = Math.ceil(queueAhead / dailyPosts) - 1 + extraDay;
 
@@ -34,8 +29,9 @@ function getEstimatedDate(queueAhead) {
 export default function SuccessPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const intervalRef = useRef(null);
   const { collegeId } = useParams();
+
+  const intervalRef = useRef(null);
 
   const initialDetails = useMemo(() => {
     try {
@@ -55,12 +51,6 @@ export default function SuccessPage() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (!details && !showLoader) {
-      // stay on success page
-    }
-  }, [details, showLoader]);
-
-  useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
@@ -78,12 +68,7 @@ export default function SuccessPage() {
         try {
           const saved = JSON.parse(sessionStorage.getItem('confessionDetails'));
 
-          if (
-            saved &&
-            saved.confessionNo &&
-            saved.queueAhead !== undefined &&
-            saved.eta
-          ) {
+          if (saved && saved.confessionNo) {
             clearInterval(intervalRef.current);
 
             setTimeout(() => {
@@ -106,116 +91,85 @@ export default function SuccessPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-100 via-white to-purple-100 px-4 py-10">
-      <div className="relative bg-white/90 backdrop-blur-xl p-8 rounded-[2rem] shadow-2xl text-center max-w-md w-full border border-violet-100 overflow-hidden">
-        {/* glow */}
-        <div className="absolute -top-10 -left-10 h-36 w-36 rounded-full bg-violet-300 opacity-20 blur-3xl" />
-        <div className="absolute -bottom-10 -right-10 h-36 w-36 rounded-full bg-purple-300 opacity-20 blur-3xl" />
+    <div className="min-h-screen flex items-center justify-center bg-black px-4 py-10 text-white">
+      <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 text-center">
+        {/* Header */}
+        <div>
+          <div className="text-5xl mb-3">💌</div>
 
-        {/* header */}
-        <div className="relative z-10">
-          <div className="text-6xl mb-3 animate-bounce">💌</div>
+          <h1 className="text-2xl font-bold">Submitted Successfully</h1>
 
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
-            Submitted Successfully
-          </h1>
-
-          <p className="mt-4 text-gray-700 leading-7">
-            Your confession has been safely submitted and added to our secure
-            processing queue.
+          <p className="mt-3 text-gray-400 text-sm">
+            Your confession is now in queue.
           </p>
 
-          <p className="mt-3 text-sm text-gray-500 leading-6">
-            🔒 Your identity remains completely anonymous and protected.
+          <p className="mt-2 text-xs text-gray-500">
+            🔒 Fully anonymous & secure
           </p>
         </div>
 
-        {/* instruction box */}
+        {/* Initial Buttons */}
         {!showLoader && !showDetails && (
-          <div className="mt-6">
-            <div className="rounded-2xl bg-violet-50 border border-violet-100 p-4 text-sm text-gray-600 leading-6">
-              📋 If you want to check your confession number, queue ahead and
-              expected post time, click the button below.
-            </div>
-
+          <div className="mt-6 space-y-3">
             <button
               onClick={handleViewDetails}
-              className="mt-5 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-purple-600 py-3 text-white font-semibold shadow-lg hover:scale-[1.02] transition"
+              className="w-full rounded-2xl bg-white text-black py-3 font-semibold hover:scale-[1.02] transition"
             >
-              View Submission Details
+              View Details
             </button>
 
             <button
               onClick={() => navigate(`/${collegeId}`)}
-              className="mt-3 w-full rounded-2xl border border-violet-600 py-3 text-violet-600 font-semibold hover:bg-violet-50 transition"
+              className="w-full rounded-2xl border border-white/20 py-3 text-white hover:bg-white/10 transition"
             >
-              Submit Another Confession
+              Submit Another
             </button>
           </div>
         )}
 
-        {/* smart loader */}
+        {/* Loader */}
         {showLoader && (
           <div className="mt-6">
-            <p className="text-sm text-gray-600 mb-3">
-              ✨ Processing your submission details...
-            </p>
+            <p className="text-sm text-gray-400 mb-3">Processing...</p>
 
-            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
+            <div className="w-full bg-white/10 rounded-full h-2">
               <div
-                className="bg-gradient-to-r from-violet-600 to-purple-600 h-3 transition-all duration-200"
-                style={{ width: `${progress}%` }}
+                className="bg-white h-2 transition-all"
+                style={{
+                  width: `${progress}%`,
+                }}
               />
             </div>
 
-            <p className="mt-3 text-sm font-medium text-violet-600">
-              {progress}% completed
-            </p>
-
-            <p className="mt-2 text-xs text-gray-500">
-              Please wait while we fetch your latest submission info.
-            </p>
+            <p className="mt-2 text-xs text-gray-400">{progress}%</p>
           </div>
         )}
 
-        {/* details */}
+        {/* Details */}
         {showDetails && details && (
-          <div className="mt-6 border-t border-violet-100 pt-6 text-left">
-            <h2 className="text-lg font-semibold text-violet-700 mb-4 text-center">
-              📋 Submission Details
-            </h2>
+          <div className="mt-6 space-y-4 text-left">
+            <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
+              <p className="text-xs text-gray-500">Confession No</p>
+              <p className="text-lg font-semibold">#{details.confessionNo}</p>
+            </div>
 
-            <div className="space-y-4">
-              <div className="rounded-2xl bg-violet-50 p-4 border border-violet-100">
-                <p className="text-sm text-gray-500">Confession Number</p>
-                <p className="text-lg font-semibold text-violet-700">
-                  #{details.confessionNo}
-                </p>
-              </div>
+            <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
+              <p className="text-xs text-gray-500">Queue Ahead</p>
+              <p className="text-lg font-semibold">{details.queueAhead}</p>
+            </div>
 
-              <div className="rounded-2xl bg-purple-50 p-4 border border-purple-100">
-                <p className="text-sm text-gray-500">Queue Ahead</p>
-                <p className="text-lg font-semibold text-purple-700">
-                  {details.queueAhead} confessions
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-indigo-50 p-4 border border-indigo-100">
-                <p className="text-sm text-gray-500">Estimated Posting Date</p>
-                <p className="text-lg font-semibold text-indigo-700">
-                  Likely by {getEstimatedDate(details.queueAhead)}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Based on current queue volume and posting schedule
-                </p>
-              </div>
+            <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
+              <p className="text-xs text-gray-500">Estimated Date</p>
+              <p className="text-lg font-semibold">
+                {getEstimatedDate(details.queueAhead)}
+              </p>
             </div>
 
             <button
-              onClick={() => navigate('/')}
-              className="mt-6 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-purple-600 py-3 text-white font-semibold shadow-lg hover:scale-[1.02] transition"
+              onClick={() => navigate(`/${collegeId}`)}
+              className="w-full mt-4 rounded-2xl bg-white text-black py-3 font-semibold"
             >
-              Submit Another Confession
+              Submit Another
             </button>
           </div>
         )}

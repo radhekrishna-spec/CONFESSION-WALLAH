@@ -11,6 +11,7 @@ export default function ConfessionForm({
   const [songQuery, setSongQuery] = useState(
     selectedSong ? `${selectedSong.title} - ${selectedSong.artist}` : '',
   );
+
   const [songSuggestions, setSongSuggestions] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -18,214 +19,126 @@ export default function ConfessionForm({
   const timeoutRef = useRef(null);
   const dropdownRef = useRef(null);
 
-  // OUTSIDE CLICK CLOSE
   useEffect(() => {
-    const handleOutsideClick = (e) => {
+    const handleClick = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setShowDropdown(false);
       }
     };
 
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') {
-        setShowDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleOutsideClick);
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-      document.removeEventListener('keydown', handleEscape);
-    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const handleSongSearch = async (value) => {
-    setSongQuery(value);
-
-    if (value.trim().length < 2) {
-      setSongSuggestions([]);
-      setShowDropdown(false);
-      return;
-    }
+  const searchSongs = async (value) => {
+    if (value.trim().length < 2) return;
 
     setIsSearching(true);
 
     try {
       const res = await fetch(
         `https://testing-confe-backend.onrender.com/api/song-search?q=${encodeURIComponent(
-          value.trim(),
+          value,
         )}`,
       );
 
       const data = await res.json();
-
-      console.log('SONG API RESPONSE:', data);
-
-      const songs = data.data || [];
-
-      setSongSuggestions(songs);
+      setSongSuggestions(data.data || []);
       setShowDropdown(true);
-    } catch (error) {
-      console.error('Song search error', error);
+    } catch {
       setSongSuggestions([]);
     } finally {
       setIsSearching(false);
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const value = e.target.value;
 
     setSongQuery(value);
-    setSelectedSong('');
-    setShowDropdown(true);
+    setSelectedSong(null);
 
     clearTimeout(timeoutRef.current);
 
     timeoutRef.current = setTimeout(() => {
-      handleSongSearch(value);
+      searchSongs(value);
     }, 400);
   };
-  const handleSongSelect = (song) => {
+
+  const selectSong = (song) => {
     const selected = {
       title: song.title,
-      artist: song.artist?.name || 'Unknown Artist',
-      source: 'manual',
+      artist: song.artist?.name || 'Unknown',
     };
 
     setSelectedSong(selected);
     setSongQuery(`${selected.title} - ${selected.artist}`);
-    setSongSuggestions([]);
     setShowDropdown(false);
   };
 
   const clearSong = () => {
     setSongQuery('');
-    setSelectedSong('');
+    setSelectedSong(null);
     setSongSuggestions([]);
-    setShowDropdown(false);
   };
 
   return (
-    <div className="rounded-3xl bg-white shadow-xl p-6 border border-gray-100">
-      <label className="font-semibold text-gray-700">
-        Is there something you always wanted to tell someone? *
-      </label>
+    <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 text-white">
+      {/* TEXT */}
+      <label className="text-sm text-gray-400">Write your confession</label>
 
       <textarea
-        rows={6}
-        maxLength={6000}
+        rows={5}
         value={confessionText}
         onChange={(e) => setConfessionText(e.target.value)}
-        className="mt-4 w-full rounded-2xl border border-gray-300 p-4 outline-none focus:ring-2 focus:ring-violet-400 resize-none"
-        placeholder="Write your confession here..."
+        className="mt-3 w-full rounded-2xl bg-white/5 border border-white/10 p-4 outline-none focus:border-white/30 resize-none"
+        placeholder="Write anonymously..."
       />
 
-      <p className="text-right text-sm text-gray-500 mt-2">{charCount}/6000</p>
+      <p className="text-right text-xs text-gray-500 mt-2">{charCount}/6000</p>
 
-      <div className="hidden mt-6 relative" ref={dropdownRef}>
-        <label className="block mb-2 font-medium text-gray-700">
-          Add a Song (optional)
+      {/* SONG (OPTIONAL) */}
+      <div className="mt-6 relative" ref={dropdownRef}>
+        <label className="text-sm text-gray-400 mb-2 block">
+          Add Song (optional)
         </label>
 
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search song..."
-            value={songQuery}
-            onChange={handleInputChange}
-            onFocus={() => songSuggestions.length > 0 && setShowDropdown(true)}
-            className="w-full border rounded-2xl p-3 pr-10 outline-none focus:ring-2 focus:ring-violet-400 shadow-sm"
-          />
-
-          {songQuery && (
-            <button
-              type="button"
-              onClick={clearSong}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition"
-            >
-              ✕
-            </button>
-          )}
-        </div>
+        <input
+          value={songQuery}
+          onChange={handleChange}
+          placeholder="Search song..."
+          className="w-full rounded-2xl bg-white/5 border border-white/10 p-3 outline-none focus:border-white/30"
+        />
 
         {/* LOADING */}
         {isSearching && (
-          <div className="absolute left-0 right-0 mt-2 rounded-2xl border bg-white p-3 shadow-lg z-50">
-            <div className="flex items-center gap-2 text-violet-600 text-sm">
-              <div className="h-4 w-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
-              Searching songs...
-            </div>
+          <div className="absolute w-full mt-2 p-3 rounded-2xl bg-black border border-white/10 text-sm text-gray-400">
+            Searching...
           </div>
         )}
 
-        {/* SUGGESTIONS */}
+        {/* LIST */}
         {!isSearching && showDropdown && songSuggestions.length > 0 && (
-          <div className="absolute left-0 right-0 mt-2 max-h-72 overflow-y-auto rounded-2xl bg-white shadow-2xl border border-gray-100 z-50 p-2">
+          <div className="absolute w-full mt-2 max-h-60 overflow-y-auto rounded-2xl bg-black border border-white/10 z-50">
             {songSuggestions.map((song) => (
               <div
                 key={song.id}
-                className="flex items-center gap-3 p-4 cursor-pointer hover:bg-violet-50 transition-all duration-200 rounded-xl mx-2 my-1"
-                onClick={() => handleSongSelect(song)}
+                onClick={() => selectSong(song)}
+                className="p-3 cursor-pointer hover:bg-white/10"
               >
-                {song.album?.cover ? (
-                  <img
-                    src={song.album.cover}
-                    alt={song.title}
-                    className="w-12 h-12 rounded-xl object-cover shadow-sm"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-xl bg-violet-100 flex items-center justify-center text-lg">
-                    🎵
-                  </div>
-                )}
-
-                <div className="flex-1">
-                  <p className="font-medium text-gray-800">{song.title}</p>
-                  <p className="text-sm text-gray-500">{song.artist?.name}</p>
-                </div>
-
-                <button
-                  type="button"
-                  className="text-xs bg-violet-100 text-violet-600 px-3 py-1 rounded-full"
-                >
-                  Add
-                </button>
+                <p className="text-sm">{song.title}</p>
+                <p className="text-xs text-gray-400">{song.artist?.name}</p>
               </div>
             ))}
           </div>
         )}
 
-        {/* NO RESULT */}
-        {!isSearching &&
-          showDropdown &&
-          songQuery.trim().length >= 2 &&
-          songSuggestions.length === 0 && (
-            <div className="absolute left-0 right-0 mt-2 rounded-2xl border bg-white p-3 text-sm text-gray-500 shadow-lg z-50">
-              No song found 🎵
-            </div>
-          )}
-
         {/* SELECTED */}
         {selectedSong && (
-          <div className="mt-4 rounded-2xl bg-violet-50 border border-violet-200 px-4 py-3 flex justify-between items-center">
-            <div>
-              <p className="text-xs text-violet-500">Selected Song</p>
-              <p className="font-semibold text-violet-700">
-                {selectedSong.title} - {selectedSong.artist}
-              </p>
-            </div>
+          <div className="mt-3 flex justify-between items-center text-sm text-gray-300">
+            <span>🎵 {selectedSong.title}</span>
 
-            <button
-              type="button"
-              onClick={clearSong}
-              className="text-red-500 text-sm"
-            >
+            <button onClick={clearSong} className="text-red-400">
               Remove
             </button>
           </div>

@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 
 export default function SubmitSection({ formData, collegeId }) {
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const [paymentEnabled, setPaymentEnabled] = useState(false);
   const [paymentLink, setPaymentLink] = useState('');
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/admin/college/${collegeId}`)
@@ -24,8 +25,6 @@ export default function SubmitSection({ formData, collegeId }) {
     }
 
     try {
-      console.log('API URL:', import.meta.env.VITE_API_URL);
-
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/confessions/submit?collegeId=${collegeId}`,
         {
@@ -36,15 +35,14 @@ export default function SubmitSection({ formData, collegeId }) {
           body: JSON.stringify({
             ...formData,
             collegeId,
+            type: window.location.pathname.includes('shayari')
+              ? 'shayari'
+              : 'confession',
             isPaid: !!paymentResponse,
             paymentId: paymentResponse?.razorpay_payment_id || null,
           }),
         },
       );
-
-      if (!response.ok) {
-        throw new Error(`Request failed: ${response.status}`);
-      }
 
       const data = await response.json();
 
@@ -61,7 +59,6 @@ export default function SubmitSection({ formData, collegeId }) {
         alert('Submission failed');
       }
     } catch (error) {
-      console.error(error);
       alert('Something went wrong');
     } finally {
       setLoading(false);
@@ -79,13 +76,9 @@ export default function SubmitSection({ formData, collegeId }) {
     setLoading(true);
 
     if (!paymentEnabled) {
-      await submitConfession(null);
+      await submitConfession();
 
-      navigate(`/${collegeId}/success`, {
-        state: {
-          loadingDetails: true,
-        },
-      });
+      navigate(`/${collegeId}/success`, { state: { loadingDetails: true } });
 
       return;
     }
@@ -94,14 +87,9 @@ export default function SubmitSection({ formData, collegeId }) {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: 200,
       currency: 'INR',
-      name: 'CONFESSION WALLAH',
-      description: 'Confession Submission',
+      name: 'Confession Wallah',
 
       handler: async function (response) {
-        console.log('Payment Success:', response);
-
-        sessionStorage.removeItem('confessionDetails');
-
         await submitConfession(response);
 
         navigate(`/${collegeId}/success`, {
@@ -111,97 +99,59 @@ export default function SubmitSection({ formData, collegeId }) {
         });
       },
 
-      prefill: {
-        name: 'Anonymous User',
-        contact: '',
-        email: '',
-      },
-
-      method: {
-        upi: true,
-      },
-
       theme: {
-        color: '#7c3aed',
+        color: '#000000',
       },
 
       modal: {
-        ondismiss: function () {
-          setLoading(false);
-        },
-      },
-
-      retry: {
-        enabled: true,
-      },
-
-      send_sms_hash: true,
-
-      readonly: {
-        name: true,
+        ondismiss: () => setLoading(false),
       },
     };
 
     const rzp = new window.Razorpay(options);
 
-    rzp.on('payment.failed', function (response) {
-      console.log('Payment Failed:', response);
+    rzp.on('payment.failed', function () {
       setLoading(false);
-      alert('Payment failed. Please try again.');
+      alert('Payment failed ❌');
     });
 
     rzp.open();
   };
 
   return (
-    <>
-      <div className="rounded-3xl backdrop-blur-lg bg-white/70 shadow-lg p-6">
-        <h3 className="text-xl font-bold text-violet-700">Final Step</h3>
+    <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 text-white">
+      {/* Heading */}
+      <h3 className="text-xl font-semibold">Final Step</h3>
 
-        <p className="mt-3 text-gray-600 leading-7">
-          Once you submit, your secret becomes lighter 💜
+      <p className="mt-2 text-gray-400 text-sm">
+        Submit your confession securely and anonymously.
+      </p>
+
+      {/* Info Box */}
+      <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-gray-300">
+        <p>
+          💌 You’ll instantly get your{' '}
+          <span className="text-white font-medium">Confession Number</span> and
+          ETA.
         </p>
 
-        <div className="mt-4 rounded-2xl border border-violet-200 bg-violet-50 p-4 text-sm leading-7 text-gray-700">
-          <p>
-            💌 Please wait — after submission we’ll instantly show your
-            <span className="font-semibold text-violet-700">
-              {' '}
-              Confession Number
-            </span>{' '}
-            and the
-            <span className="font-semibold text-violet-700">
-              {' '}
-              estimated posting time
-            </span>
-            .
-          </p>
+        <p className="mt-2">🔒 Your identity stays private.</p>
 
-          <p className="mt-3">
-            🔒 Your privacy will remain completely secret and secure.
-          </p>
-
-          <p className="mt-3 text-red-500 font-medium">
-            ⚠️ Once submitted, this confession cannot be edited.
-          </p>
-        </div>
-
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="mt-6 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-purple-600 py-4 text-white font-semibold shadow-lg hover:scale-[1.02] transition disabled:opacity-50"
-        >
-          {loading ? (
-            <span className="flex items-center justify-center">
-              Processing<span className="animate-bounce ml-1">...</span>
-            </span>
-          ) : paymentEnabled ? (
-            'Pay ₹2 & Submit'
-          ) : (
-            'Submit Confession'
-          )}
-        </button>
+        <p className="mt-2 text-red-400">⚠️ Cannot edit after submission.</p>
       </div>
-    </>
+
+      {/* Button */}
+      <button
+        onClick={handleSubmit}
+        disabled={loading}
+        className="mt-6 w-full rounded-2xl bg-white text-black py-4 font-semibold transition hover:scale-[1.02] disabled:opacity-50"
+      >
+        {loading
+          ? 'Processing...'
+          : paymentEnabled
+            ? 'Pay ₹2 & Submit'
+            : 'Submit Confession'}
+      </button>
+    </div>
   );
 }
