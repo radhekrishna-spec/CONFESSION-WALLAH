@@ -33,7 +33,7 @@ export default function SubmitSection({ formData, collegeId }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            ...formData,
+            confession: formData.message, // 🔥 FIX
             collegeId,
             type: window.location.pathname.includes('shayari')
               ? 'shayari'
