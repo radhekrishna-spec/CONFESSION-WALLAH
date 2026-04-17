@@ -76,9 +76,12 @@ export default function SubmitSection({ formData, collegeId }) {
     setLoading(true);
 
     if (!paymentEnabled) {
-      await submitConfession();
+      navigate(`/${collegeId}/success`, {
+        state: { loadingDetails: true },
+      });
 
-      navigate(`/${collegeId}/success`, { state: { loadingDetails: true } });
+      // 🔥 background submission
+      submitConfession();
 
       return;
     }
@@ -88,15 +91,13 @@ export default function SubmitSection({ formData, collegeId }) {
       amount: 200,
       currency: 'INR',
       name: 'Confession Wallah',
-
-      handler: async function (response) {
-        await submitConfession(response);
-
+      handler: function (response) {
         navigate(`/${collegeId}/success`, {
-          state: {
-            loadingDetails: true,
-          },
+          state: { loadingDetails: true },
         });
+
+        // background call
+        submitConfession(response);
       },
 
       theme: {
