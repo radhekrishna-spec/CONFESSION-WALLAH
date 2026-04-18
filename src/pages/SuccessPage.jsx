@@ -78,7 +78,7 @@ export default function SuccessPage() {
           setShowDetails(true);
         }, 300);
       }
-    }, 600); // thoda delay for smooth feel
+    }, 500);
   };
 
   return (
