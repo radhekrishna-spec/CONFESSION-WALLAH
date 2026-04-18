@@ -61,19 +61,27 @@ export default function SuccessPage() {
     setShowDetails(false);
     setProgress(0);
 
-    // 🔥 smooth fake progress
     intervalRef.current = setInterval(() => {
-      setProgress((prev) => (prev < 90 ? prev + 3 : prev));
+      setProgress((prev) => (prev < 90 ? prev + 2 : prev));
     }, 200);
 
     try {
-      // 🔥 actual API call
-      const res = await fetch(`/api/confessions/status?collegeId=${collegeId}`);
-      const data = await res.json();
+      const res = await fetch(
+        `https://testing-confe-backend.onrender.com/api/confessions/status?collegeId=${collegeId}`,
+      );
+
+      const text = await res.text();
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.error('❌ Not JSON:', text);
+        throw new Error('Invalid server response');
+      }
 
       clearInterval(intervalRef.current);
 
-      // 🔥 smooth finish animation
       setProgress(100);
 
       setTimeout(() => {
@@ -84,7 +92,9 @@ export default function SuccessPage() {
     } catch (err) {
       clearInterval(intervalRef.current);
       setShowLoader(false);
-      console.error(err);
+
+      console.error('❌ API ERROR:', err);
+      alert('Server se data nahi aaya. Try again.');
     }
   };
 
