@@ -83,7 +83,7 @@ export default function SuccessPage() {
         console.log('📡 POLL DATA:', data);
 
         // 🔥 CHECK: jab tak DB me na aaye
-        if (data?.confessionNo === saved.confessionNo) {
+        if (String(data?.confessionNo) === String(saved.confessionNo)) {
           clearInterval(intervalRef.current);
 
           setProgress(100);
