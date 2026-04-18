@@ -56,46 +56,29 @@ export default function SuccessPage() {
     };
   }, []);
 
-  const handleViewDetails = async () => {
+  const handleViewDetails = () => {
     setShowLoader(true);
     setShowDetails(false);
     setProgress(0);
 
     intervalRef.current = setInterval(() => {
-      setProgress((prev) => (prev < 90 ? prev + 2 : prev));
-    }, 200);
+      setProgress((prev) => (prev < 100 ? prev + 5 : prev));
+    }, 100);
 
-    try {
-      const res = await fetch(
-        `https://testing-confe-backend.onrender.com/api/confessions/status?collegeId=${collegeId}`,
-      );
+    setTimeout(() => {
+      const saved = JSON.parse(sessionStorage.getItem('confessionDetails'));
 
-      const text = await res.text();
+      if (saved) {
+        clearInterval(intervalRef.current);
+        setProgress(100);
 
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        console.error('❌ Not JSON:', text);
-        throw new Error('Invalid server response');
+        setTimeout(() => {
+          setDetails(saved);
+          setShowLoader(false);
+          setShowDetails(true);
+        }, 300);
       }
-
-      clearInterval(intervalRef.current);
-
-      setProgress(100);
-
-      setTimeout(() => {
-        setDetails(data);
-        setShowLoader(false);
-        setShowDetails(true);
-      }, 400);
-    } catch (err) {
-      clearInterval(intervalRef.current);
-      setShowLoader(false);
-
-      console.error('❌ API ERROR:', err);
-      alert('Server se data nahi aaya. Try again.');
-    }
+    }, 600); // thoda delay for smooth feel
   };
 
   return (
