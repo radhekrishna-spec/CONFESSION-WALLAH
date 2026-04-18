@@ -25,6 +25,13 @@ export default function SubmitSection({ formData, collegeId }) {
     }
 
     try {
+      console.log('🚀 SENDING:', {
+        confession: formData.message,
+        type: window.location.pathname.includes('shayari')
+          ? 'shayari'
+          : 'confession',
+        fullFormData: formData,
+      });
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/confessions/submit?collegeId=${collegeId}`,
         {
