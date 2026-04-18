@@ -56,29 +56,62 @@ export default function SuccessPage() {
     };
   }, []);
 
-  const handleViewDetails = () => {
+  const handleViewDetails = async () => {
     setShowLoader(true);
     setShowDetails(false);
     setProgress(0);
 
+    const saved = JSON.parse(sessionStorage.getItem('confessionDetails'));
+
+    if (!saved?.confessionNo) return;
+
+    let attempts = 0;
+    const maxAttempts = 10;
+
     intervalRef.current = setInterval(() => {
-      setProgress((prev) => (prev < 100 ? prev + 5 : prev));
-    }, 100);
+      setProgress((prev) => (prev < 90 ? prev + 3 : prev));
+    }, 200);
 
-    setTimeout(() => {
-      const saved = JSON.parse(sessionStorage.getItem('confessionDetails'));
+    const poll = async () => {
+      try {
+        const res = await fetch(
+          `https://testing-confe-backend.onrender.com/api/confessions/by-id?collegeId=${collegeId}&confessionNo=${saved.confessionNo}`,
+        );
 
-      if (saved) {
+        const data = await res.json();
+
+        console.log('📡 POLL DATA:', data);
+
+        // 🔥 CHECK: jab tak DB me na aaye
+        if (data?.confessionNo === saved.confessionNo) {
+          clearInterval(intervalRef.current);
+
+          setProgress(100);
+
+          setTimeout(() => {
+            setDetails(data);
+            setShowLoader(false);
+            setShowDetails(true);
+          }, 300);
+
+          return;
+        }
+
+        attempts++;
+        if (attempts < maxAttempts) {
+          setTimeout(poll, 800);
+        } else {
+          throw new Error('Timeout waiting for confession');
+        }
+      } catch (err) {
         clearInterval(intervalRef.current);
-        setProgress(100);
-
-        setTimeout(() => {
-          setDetails(saved);
-          setShowLoader(false);
-          setShowDetails(true);
-        }, 300);
+        setShowLoader(false);
+        console.error(err);
+        alert('Thoda wait karo, server slow hai');
       }
-    }, 500);
+    };
+
+    poll();
   };
 
   return (
