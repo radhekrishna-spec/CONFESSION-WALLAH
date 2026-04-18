@@ -56,38 +56,36 @@ export default function SuccessPage() {
     };
   }, []);
 
-  const handleViewDetails = () => {
+  const handleViewDetails = async () => {
     setShowLoader(true);
     setShowDetails(false);
     setProgress(0);
 
+    // 🔥 smooth fake progress
     intervalRef.current = setInterval(() => {
-      setProgress((prev) => {
-        let next = prev < 95 ? prev + 5 : prev;
-
-        try {
-          const saved = JSON.parse(sessionStorage.getItem('confessionDetails'));
-
-          if (saved && saved.confessionNo) {
-            clearInterval(intervalRef.current);
-
-            setTimeout(() => {
-              setProgress(100);
-              setDetails(saved);
-
-              setTimeout(() => {
-                setShowLoader(false);
-                setShowDetails(true);
-              }, 300);
-            }, 200);
-
-            return 100;
-          }
-        } catch {}
-
-        return next;
-      });
+      setProgress((prev) => (prev < 90 ? prev + 3 : prev));
     }, 200);
+
+    try {
+      // 🔥 actual API call
+      const res = await fetch(`/api/confessions/status?collegeId=${collegeId}`);
+      const data = await res.json();
+
+      clearInterval(intervalRef.current);
+
+      // 🔥 smooth finish animation
+      setProgress(100);
+
+      setTimeout(() => {
+        setDetails(data);
+        setShowLoader(false);
+        setShowDetails(true);
+      }, 400);
+    } catch (err) {
+      clearInterval(intervalRef.current);
+      setShowLoader(false);
+      console.error(err);
+    }
   };
 
   return (
