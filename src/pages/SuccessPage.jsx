@@ -74,8 +74,11 @@ export default function SuccessPage() {
 
     const poll = async () => {
       try {
+        // const res = await fetch(
+        //   `https://testing-confe-backend.onrender.com/api/confessions/by-id?collegeId=${collegeId}&confessionNo=${saved.confessionNo}`,
+        // );
         const res = await fetch(
-          `https://testing-confe-backend.onrender.com/api/confessions/by-id?collegeId=${collegeId}&confessionNo=${saved.confessionNo}`,
+          `http://localhost:3008/api/confessions/by-id?collegeId=${collegeId}&confessionNo=${saved.confessionNo}`,
         );
 
         const data = await res.json();
