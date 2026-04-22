@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { API_BASE } from '../config';
 
 export default function ConfessionForm({
   confessionText,
@@ -37,7 +38,7 @@ export default function ConfessionForm({
 
     try {
       const res = await fetch(
-        `https://testing-confe-backend.onrender.com/api/song-search?q=${encodeURIComponent(
+        `${API_BASE}/api/song-search?q=${encodeURIComponent(
           value,
         )}`,
       );

@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-
-const API_BASE = import.meta.env.DEV
-  ? 'http://localhost:3001'
-  : 'https://testing-confe-backend.onrender.com';
+import { API_BASE } from '../config';
 
 export default function ConfessionDetailPage() {
   const { id, collegeId } = useParams();
