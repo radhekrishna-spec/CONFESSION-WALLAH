@@ -37,7 +37,7 @@ export default function SubmitSection({ formData, collegeId }) {
       },
     );
     const data = await response.json();
-    console.log('🔥 API RESPONSE:', data);
+    // console.log('🔥 API RESPONSE:', data);
 
     if (data.success) {
       sessionStorage.setItem('confessionDetails', JSON.stringify(data));
@@ -90,7 +90,7 @@ export default function SubmitSection({ formData, collegeId }) {
         order_id: orderData.id,
 
         handler: async function (response) {
-          console.log('💰 Payment Success:', response);
+          // console.log('💰 Payment Success:', response);
 
           // ✅ navigate AFTER payment
           navigate(`/${collegeId}/success`, {

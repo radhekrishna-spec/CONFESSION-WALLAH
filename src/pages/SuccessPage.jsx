@@ -51,7 +51,7 @@ export default function SuccessPage() {
       try {
         const saved = JSON.parse(sessionStorage.getItem('confessionDetails'));
 
-        console.log('🔁 polling...', saved);
+        // console.log('🔁 polling...', saved);
 
         if (!saved || !saved.confessionNo) {
           attempts++;
