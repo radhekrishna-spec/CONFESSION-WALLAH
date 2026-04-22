@@ -54,19 +54,72 @@ export default function SubmitSection({ formData, collegeId }) {
 
     setLoading(true);
 
-    // 👉 navigate immediately
-    navigate(`/${collegeId}/success`, {
-      state: {
-        message: formData.message, // optional
-        collegeId,
-      },
-    });
-    sessionStorage.removeItem('confessionDetails');
-    // 👉 background API call (NO await)
-    submitConfession().catch((err) => {
-      console.error(err);
-      sessionStorage.removeItem('confessionDetails'); // ❗ reset
-    });
+    // ✅ If payment NOT required → normal flow
+    if (!paymentEnabled) {
+      navigate(`/${collegeId}/success`, {
+        state: { message: formData.message, collegeId },
+      });
+
+      sessionStorage.removeItem('confessionDetails');
+
+      submitConfession().catch(console.error);
+      return;
+    }
+
+    // 🔥 PAYMENT FLOW STARTS HERE
+    try {
+      // 1. Create order from backend (you need this API)
+      const orderRes = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/payment/create-order`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: 200 }), // ₹2 = 200 paise
+        },
+      );
+
+      const orderData = await orderRes.json();
+
+      // 2. Razorpay options
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY,
+        amount: orderData.amount,
+        currency: 'INR',
+        name: 'Confession App',
+        description: 'Submit Confession',
+        order_id: orderData.id,
+
+        handler: async function (response) {
+          console.log('💰 Payment Success:', response);
+
+          // ✅ navigate AFTER payment
+          navigate(`/${collegeId}/success`, {
+            state: { message: formData.message, collegeId },
+          });
+
+          sessionStorage.removeItem('confessionDetails');
+
+          // ✅ submit with payment
+          await submitConfession(response);
+        },
+
+        prefill: {
+          name: 'Anonymous',
+        },
+
+        theme: {
+          color: '#ffffff',
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error('❌ Payment error:', err);
+      alert('Payment failed. Try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
