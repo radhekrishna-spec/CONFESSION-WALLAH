@@ -27,6 +27,7 @@ export default function SubmitSection({ formData, collegeId }) {
         },
         body: JSON.stringify({
           confession: formData.message,
+          nickname: formData.nickname,
           collegeId,
           type: window.location.pathname.includes('shayari')
             ? 'shayari'
